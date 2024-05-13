@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# git describe --abbrev=0 --tags |
+# ( grep -o -E '^v[0-9]{4}$' || "version not found" ) |
+# grep -o -E '[0-9]+' |
+# ( read old_version && echo $((old_version+1)) ) |
+# ( read new_version && echo v$new_version )
+
+current_version=$(git describe --abbrev=0 --tags)
+# Remove leading 'v' (if present)
+version_without_v=${current_version#v}
+
+# Split into major, minor, and patch versions using parameter expansion
+major_version=${version_without_v%%.*}
+minor_version=${version_without_v#*.}
+minor_version=${minor_version%%.*}
+patch_version=${version_without_v##*.}
+
+new_patch_version=$((patch_version + 1))
+new_version="v$major_version.$minor_version.$new_patch_version"
+
+echo $new_version
